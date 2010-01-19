@@ -1,0 +1,9 @@
+#!/bin/bash
+
+cd /home/taylan/sites/wiki/repo
+git pull
+
+export PYTHONPATH=../lib
+
+cd /home/taylan/sites/wiki/app/wiki
+./manage.py update_doc_wiki_index
