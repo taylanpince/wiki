@@ -17,9 +17,9 @@ types of information:
 
 - Real world examples of good interface elements and designs
 
+* * *
 
-Methodologies
--------------
+## Methodologies
 
 The first document that should be read by everyone who is going to prototype,
 design, or develop on the iPhone platform is Apple's Human Interface 
@@ -33,9 +33,9 @@ If you are developer who is new to the platform, you should also read the
 [iPhone Application Programming Guide](http://developer.apple.com/iphone/library/documentation/iPhone/Conceptual/iPhoneOSProgrammingGuide/Introduction/Introduction.html), 
 which provides a detailed overview of the whole process.
 
+* * *
 
-Resources
----------
+## Resources
 
 Creating a prototype is one of the most important steps in an iPhone app's
 development cycle. There are several different tools that can be used:
@@ -61,8 +61,9 @@ development cycle. There are several different tools that can be used:
 
 - [If you love paper prototyping](http://www.designcommission.com/shop/iphone-stencil-kit) there's a fantastic metal draughting-style template for you!
 
-Examples
---------
+* * *
+
+## Examples
 
 Here are a few good interface examples:
 

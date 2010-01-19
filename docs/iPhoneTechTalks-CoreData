@@ -1,8 +1,7 @@
 Working with Core Data by Michael Jurewitz (jurewitz@apple.com)
 ===============================================================
 
-Core Data
----------
+## Core Data
 
 - Basic features
 	- Object relational
@@ -15,8 +14,7 @@ Core Data
 - Integrates directly with UIKit
 
 
-Architecture
-------------
+## Architecture
 
 - All objects managed by Core Data are subclasses of NSManagedObject
 	- This is a row of data in your database
@@ -51,8 +49,7 @@ Architecture
 - NSFetchRequest is used to get data out of the database
 
 
-Structuring Data
-----------------
+## Structuring Data
 
 - Design your data models
 	- Find a balance between speed and space
@@ -88,8 +85,7 @@ Structuring Data
 	- What about redundancy or fragmentation?
 
 
-Fetching Efficiently
---------------------
+## Fetching Efficiently
 
 - Basic fetching
 	- Set the entity to fetch against
@@ -136,8 +132,7 @@ Fetching Efficiently
 	- If a native aggregate method is not enough
 
 
-Integrating with UIKit
-----------------------
+## Integrating with UIKit
 
 - Tips for displaying data
 	- Managed Objects are still objects
@@ -159,8 +154,7 @@ Integrating with UIKit
 		  separate controllers for different data sets
 
 
-Threading
----------
+## Threading
 
 - Rules of the road
 	- Practice safe object ownership

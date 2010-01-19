@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+
+{% block title %}Home{% endblock %}
+{% block nav_home %}active{% endblock %}
+
+{% block content %}
+<ul>
+    {% for page in pages %}
+    <li><a href="{{ page.get_absolute_url }}">{{ page.slug }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}

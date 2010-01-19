@@ -1,8 +1,7 @@
 Maximizing iPhone App Performance by Michael Jurewitz (jurewitz@apple.com)
 ==========================================================================
 
-Tuning for Performance
-----------------------
+## Tuning for Performance
 
 - iPhone and iPod Touch cannot even be compared to a Mac in terms of hardware
 - Instruments is the best tool for memory analysis
@@ -11,8 +10,7 @@ Tuning for Performance
 	- Always check for graphics performance on the device
 
 
-Drawing and Scrolling
----------------------
+## Drawing and Scrolling
 
 - Use built-in drawing whenever possible
 	- UIKit views are already optimized
@@ -48,8 +46,7 @@ Drawing and Scrolling
 		- Create a single view that does all drawing and layout
 
 
-Application Launch
-------------------
+## Application Launch
 
 - Design apps for fast launch, short use
 	- Consider the user's immediate needs
@@ -61,8 +58,7 @@ Application Launch
 		- Make your UI responsive as soon as possible
 
 
-Memory Usage
-------------
+## Memory Usage
 
 - Overview: 70MB already allocated before your app launches
 	- 12MB for graphics
@@ -131,8 +127,7 @@ Memory Usage
 	  created during the loop are all drained when the process is complete
 
 
-Files and Data
---------------
+## Files and Data
 
 - Use memory mapping for large files
 	- Avoid loading large files into memory
@@ -149,8 +144,7 @@ Files and Data
 	- Use plists for structured data files when bundling data (instead of XML)
 
 
-Power and Battery Life
-----------------------
+## Power and Battery Life
 
 - Radios: 3G
 	- Very expensive to send data
