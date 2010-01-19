@@ -4,7 +4,7 @@ iPhone Prototyping Best Practices
 Prototyping for the iPhone platform has its own unique challenges and is very
 different from structuring a web application. Since the UI elements are
 limited to what's offered by Apple, and every application on the platform has
-to be adhere to their strict human interface guidelines, it's crucial to
+to adhere to their strict human interface guidelines, it's crucial to
 get a feel of what iPhone applications are capable of, and how they should
 be designed, before starting the process.
 
