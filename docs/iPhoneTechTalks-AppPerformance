@@ -1,0 +1,183 @@
+Maximizing iPhone App Performance by Michael Jurewitz (jurewitz@apple.com)
+==========================================================================
+
+Tuning for Performance
+----------------------
+
+- iPhone and iPod Touch cannot even be compared to a Mac in terms of hardware
+- Instruments is the best tool for memory analysis
+- Shark can be used as well
+- Choose the right tuning environment
+	- Always check for graphics performance on the device
+
+
+Drawing and Scrolling
+---------------------
+
+- Use built-in drawing whenever possible
+	- UIKit views are already optimized
+	- Take advantage of animatable view properties
+
+- Custom drawing
+	- Mark views as opaque
+	- Compositing is one of the most expensive processes on the device
+	- Draw minimally
+		- Call setNeedsDisplayInRect
+		- Check the rectangle passed to drawRect
+
+- Cache static drawing objects
+	- Be prepared to release them in low memory conditions
+
+- Invalidate timers before creating new timers
+	- When an application gets suspended, invalidate your timers
+
+- Use PNG files
+	- Optimized at build time
+	- Converted from unmultiplied RGBA to premultiplied BGRA
+	- Unnecessary data removed
+	- Compression rate may be increased
+
+- Improving scrolling performance
+	- Use opaque views whenever possible
+	- Avoid allocating views during scrolling
+		- Allocating views is very expensive
+	- Reuse table cells
+		- Tag cells with reuse ID's
+		- Dequeue reusable cells
+	- Collapse cell view hierarchy
+		- Create a single view that does all drawing and layout
+
+
+Application Launch
+------------------
+
+- Design apps for fast launch, short use
+	- Consider the user's immediate needs
+	- Make your app launch and quit REALLY fast
+	- Get your UI on screen as quickly as possible
+		- Don't perform network operations in applicationDidFinishLaunching
+		- Use a small initial NIB file
+		- Don't load images that you won't use
+		- Make your UI responsive as soon as possible
+
+
+Memory Usage
+------------
+
+- Overview: 70MB already allocated before your app launches
+	- 12MB for graphics
+	- 32MB for kernel (wired)
+	- 12MB for daemons
+	- 10MB for springboard
+	- 4MB for phone
+
+- Virtual memory system
+	- No swap file
+	- Writable pages stay in memory
+	- Read-only pages can be evicted and reloaded
+	- No garbage collection
+	- Standard reference counting is the only way
+
+- Static memory
+	- Thumb instruction set (works on all devices)
+		- No floating point access
+	- Thumb-2 instruction set (only on 3GS)
+		- Has floating point access (much better for games)
+	- Don't use unnecessary compiler options
+		- Avoid C++ exceptions
+		- Avoid Runtime Type Identification (RTTI)
+
+- Dynamic memory
+	- Avoid autoreleasing objects
+		- Autorelease can be expensive
+		- Use release whenever possible
+	- Use direct allocation instead of convenience methods
+	- Cache the right objects
+		- Cache frequently used objects
+		- Be prepared to release them when there is a low memory warning
+	- Declare properties as nonatomic
+		- Access to nonatomic objects is up to 10 times faster (vs atomic)
+		- However, nonatomic objects are NOT thread safe
+	- Image and layer objects are small by themselves, but backing store is
+	  usually quite large
+		- Use appropriately sized images (don't scale unless you have to)
+		- Images are decompressed in memory to display them (4 bits per px)
+			- 320px x 480px x 48/px = 614.4KB
+	- Use UIImage imageNamed for small, frequently used images
+	- UIImage initWithData retains the NSData, on a memory warning, release the
+	  NSData if you can recreate it
+	- Use NSData initWithContentOfMappedFile for large files
+	- UIImage initWithContentsOfFile only retains the path, and doesn't load it
+	  until it's needed for display. It doesn't cache any data.
+
+- Low Memory Warnings
+	- One foreground app, many processes
+	- Each process consumes memory
+	- Background processes are killed before the frontmost app is exited
+	- Any app may create low memory conditions
+	- Expect memory warnings
+	- You MUST respond to low memory warnings
+		- Release any objects that can be reconstructed
+		- Implement applicationDidReceiveMemoryWarning in your app delegate
+			- Create accessor method to return the object
+			- Release the property, then set it to nil
+		- Implement didReceiveMemoryWarning in your view controller and
+		  viewDidUnload in your views
+			- Release references to retained outlets
+		- Listen to memory warning notifications through the app delegate
+
+- Autorelease pools
+	- Use nested autorelease pools around loops to make sure that the objects
+	  created during the loop are all drained when the process is complete
+
+
+Files and Data
+--------------
+
+- Use memory mapping for large files
+	- Avoid loading large files into memory
+
+- For large data sets, use Core Data
+	- Doesn't keep entire data set in memory
+
+- Don't include unnecessary files
+
+- Data in ~/Documents is backed up, don't use this for caches
+	- Use ~/Library/Caches for data that can be reacquired
+
+- plists are converted to compact binary format by Xcode
+	- Use plists for structured data files when bundling data (instead of XML)
+
+
+Power and Battery Life
+----------------------
+
+- Radios: 3G
+	- Very expensive to send data
+	- 3G networks require phones to stay in high power state for a few seconds 
+	  after lat packet is sent or received
+	- Coalesce data into large chunks, rather than a thin stream
+	- Minimize amount of data transmitted, use compact data formats
+
+- Radios: Wi-Fi
+	- Uses less power than 3G
+	- Detect when you are on Wi-Fi rather than on cell
+
+- Core Location
+	- Use least amount of accuracy necessary, default is the most expensive
+		- If you only care about where the user is in general, ask for a wider
+		  location area
+	- Set the distance filter property appropriately
+	- Turn it off when you are done
+
+- CPU/GPU
+	- Improving performance results in better battery life (fast code = less power)
+	- iPhone OS is event based, DO NOT poll
+	- Subscribe to events whenever possible
+	- If you must poll, use a timer with a low frequency
+	- Consolidate CPU usage into short bursts
+		- Allows CPU to enter idle state
+		- Use Instruments: CPU Sampler to check CPU activity level
+	- When using OpenGL ES
+		- Pick a fixed frame rate
+		- If frame hasn't changed, don't redraw

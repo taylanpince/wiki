@@ -1,0 +1,83 @@
+iPhone Prototyping Best Practices ([[!taglink under_construction]])
+==========================================================
+
+Prototyping for the iPhone platform has its own unique challenges and is very
+different from structuring a web application. Since the UI elements are
+limited to what's offered by Apple, and every application on the platform has
+to be adhere to their strict human interface guidelines, it's crucial to
+get a feel of what iPhone applications are capable of, and how they should
+be designed, before starting the process.
+
+This document will serve as a hub for gathering together a few different
+types of information:
+
+- Prototyping methodologies for the iPhone platform
+
+- Resources and tools that can be used in the process
+
+- Real world examples of good interface elements and designs
+
+
+Methodologies
+-------------
+
+The first document that should be read by everyone who is going to prototype,
+design, or develop on the iPhone platform is Apple's Human Interface 
+Guidelines. [Getting Started with User Experience](http://developer.apple.com/iphone/library/referencelibrary/GettingStarted/GS_UserExperience_iPhone/index.html)
+provides a good starting point, and the [iPhone Human Interface Guidelines](http://developer.apple.com/iphone/library/documentation/UserExperience/Conceptual/MobileHIG/Introduction/Introduction.html) 
+is where the rules are outlined. Apple vigurously tests every application 
+submitted to the store against these rules, and most apps are rejected if they
+don't meet the criteria.
+
+If you are developer who is new to the platform, you should also read the 
+[iPhone Application Programming Guide](http://developer.apple.com/iphone/library/documentation/iPhone/Conceptual/iPhoneOSProgrammingGuide/Introduction/Introduction.html), 
+which provides a detailed overview of the whole process.
+
+
+Resources
+---------
+
+Creating a prototype is one of the most important steps in an iPhone app's
+development cycle. There are several different tools that can be used:
+
+- [Graffle Stencils](http://graffletopia.com/search/iphone)
+  Especially the [Ultimate iPhone Stencil](http://graffletopia.com/stencils/413) 
+  is used by most
+
+- [Yahoo Design Pattern Library](http://developer.yahoo.com/ypatterns/wireframes/)
+  provides resources for most common iPhone UI elements
+
+- [iPhone GUI PSD](http://www.teehanlax.com/blog/?p=1628) is a Photoshop
+  document that contains some of the most common UI elements
+
+- [Prototyping Using Fireworks](http://unitid.nl/2009/04/prototyping-for-the-iphone-using-fireworks-cs3/) 
+  is an alternative method for building interactive prototypes
+
+- [LiveView](http://www.zambetti.com/projects/liveview/) is a desktop and
+  iPhone app combination that lets you transmit anything on the desktop
+  to the device and interact with it
+
+- [Axure RP Widget Library for iPhone](http://www.axure.com/widgetLibraries.aspx) is available from Axure for Axure RP 5.5
+
+- [If you love paper prototyping](http://www.designcommission.com/shop/iphone-stencil-kit) there's a fantastic metal draughting-style template for you!
+
+Examples
+--------
+
+Here are a few good interface examples:
+
+- [Satisfaction Remote](http://satisfactionremote.com/)
+
+- [Birdbrain](http://birdbrainapp.com/)
+
+- [Cha-Ching for iPhone](http://www.midnightapps.com/)
+
+- [Tweetie for iPhone](http://www.atebits.com/tweetie-iphone/)
+
+- [Home Automation Interface](http://www.flickr.com/photos/paolopasseri/)
+
+- [Pennies](http://designbyaknife.com/pennies/)
+
+- [Tapbots](http://tapbots.com/)
+
+- [Ego](http://ego-app.com/)
