@@ -1,0 +1,6 @@
+DATABASE_ENGINE = 'mysql'
+DATABASE_NAME = 'wiki'
+DATABASE_USER = 'wikidbu'
+DATABASE_PASSWORD = 'KExeJBEC8D'
+
+MEDIA_URL = '/media/'

@@ -39,6 +39,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.doc.XViewMiddleware',
 )
 
+CACHE_BACKEND = 'db://caches'
+
 ROOT_URLCONF = 'wiki.urls'
 
 TEMPLATE_DIRS = (
