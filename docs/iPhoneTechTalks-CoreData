@@ -1,0 +1,170 @@
+Working with Core Data by Michael Jurewitz (jurewitz@apple.com)
+===============================================================
+
+Core Data
+---------
+
+- Basic features
+	- Object relational
+	- Automatic data persistence
+	- Efficient access
+
+- Memory efficiency
+	- Core data lets you deal with only the data that you need immediately
+
+- Integrates directly with UIKit
+
+
+Architecture
+------------
+
+- All objects managed by Core Data are subclasses of NSManagedObject
+	- This is a row of data in your database
+	- Encapsulates all your data and relationships
+	- Provides optional validation
+
+- Managed objects live in a scratch pad called NSManagedObjectContext
+	- Tracks changes to model properties
+	- Handles actions on data
+		- Inserts
+		- Fetches
+		- Saves
+		- Deletes
+
+- Behind the context, there is the actual storage, represented by 
+  NSPersistentStore
+	- Data is stored in a SQLite database
+	- Core Data handles all interactions at this layer for you
+	- Schema and data are private, don't manually manipulate them
+
+- Modelling of the data is through the NSManagedObjectModel class
+	- Describes the structure of your data
+	- Defines rules for your object graph
+	- Used to create the store file
+
+- Within the model there are NSEntityDescription objects
+	- Blueprint for managed objects
+
+- Sitting between the three different layers, there is a class called 
+  NSPersistentStoreCoordinator
+
+- NSFetchRequest is used to get data out of the database
+
+
+Structuring Data
+----------------
+
+- Design your data models
+	- Find a balance between speed and space
+	- Design with the UI in mind
+	- Avoid entity inheritance
+	- Don't put blobs in the database
+
+- Speed vs Space
+	- Normalization
+		- Perfectly factored, no repetition
+		- Space efficient
+	- Denormalization
+		- Repetition of data
+		- Faster access (to a point)
+		- Less space efficient
+		- Makes sense when you don't want to follow a relationship only to 
+		  figure out if there is data available
+	- Normalize first, find the best organization
+
+- Think about the UI when modelling your data
+	- What's the focus of your application?
+	- What data do you need at each step?
+	- It's OK for your model to evolve (Core Data has migration support)
+
+- Avoid entity inheritance
+	- In a database context, entity inheritance wastes a lot of space
+
+- Put blobs where they belong
+	- Databases provide highly efficient access
+		- Textual data
+		- Data easily described by text
+	- Databases are flat files
+	- What about redundancy or fragmentation?
+
+
+Fetching Efficiently
+--------------------
+
+- Basic fetching
+	- Set the entity to fetch against
+	- Set a predicate (if applicable) to filter the results
+	- Execute the fetch request
+
+- Faulting
+	- When core data executes a fetch request on a specific entity, it doesn't 
+	  follow relationships
+	- To get items through a relationship, you can access the relationship when
+	  you need it, and a new fetch request will be made automatically
+	- Prefetching is also an option, when you know what data to get
+		- [fetch setRelationshipKeyPathsForPrefetching:]
+		- Use judiciously, it could consume a lot of memory
+
+- Batching
+	- There is only so much data that can fit on screen
+	- Save memory by getting parts of data
+	- Only deal with what's necessary
+	- Easy to use
+		- [fetch setFetchBatchSize:]
+		- Only the batch size of results will be returned
+		- Returned NSArray will still respond to the proper count
+		- Keep accessing new entries as needed
+
+- Partial Faulting
+	- For when you only need a subset of the data
+	- Heavily UI influenced
+	- Get only what you need
+		- [fetch setPropertiesToFetch:]
+		- Supposed to take property description objects, but also accepts an
+		  array of property names as NSStrings
+
+- In Database Aggregates
+	- Supported natively
+	- If all that is needed is a count, use the aggregate call:
+		- [request countForFetchRequest]
+	- Taking a sum, or other aggregates methods are a bit more involved:
+		- [NSExpression expressionForFunction:@"sum:", arguments:]
+		  NSExpressionDescription *expressionDescription
+		  [expressionDescription setExpression:];
+
+- Custom Aggregates
+	- If a native aggregate method is not enough
+
+
+Integrating with UIKit
+----------------------
+
+- Tips for displaying data
+	- Managed Objects are still objects
+	- Leverage change tracking notifications
+		- Register for object level changes (KVO)
+		- Register for graph level changes (NSNotifications)
+			- NSManagedObjectContextDidSaveNotification
+
+- UITableView
+	- List of data
+	- Divided into sections
+		- How many sections?
+		- How many objects per section?
+	- Core data can help: NSFetchResultsController
+		- Fetches, orders and sections your data
+		- Computes and persistently caches section information
+		- Updates information by observing changes
+		- Never change settings on a NSFetchedResultsController, instead create
+		  separate controllers for different data sets
+
+
+Threading
+---------
+
+- Rules of the road
+	- Practice safe object ownership
+	- Core Data uses a policy of isolation, one managed object context per thread
+	- Notify on changes (the other thread's context can update itself)
+	- Never pass managed objects or data between threads
+	- Prefere object ID's if you have to pass anything
