@@ -1,0 +1,20 @@
+URL Match Regular Expression
+============================
+
+A comprehensive regular expression to match many kind of URLs.
+
+@@ python
+import re
+
+url_re = re.compile(r"\b%(urls)s:[%(any)s]+?(?=[%(punc)s]*(?:[^%(any)s]|$))" % {
+    "urls": "(?: %s)" % "|".join("http telnet gopher file wais ftp https".split()),
+    "any": r"\w/#~:.?+=&%@!\-.:?\-",
+    "punc": r".:?\-",
+}, re.VERBOSE)
+
+reply_re = re.compile(r"@([\w]+?)\b")
+
+print url_re.sub(lambda m: '<a href="%(url)s">%(url)s</a>' % {"url": m.group()}, "Hello, this is a test tweet http://tinyurl.com/Bsajh34 or another one ftp://hehe.com.")
+
+print reply_re.sub(lambda m: '<a href="http://twitter.com/%(user)s">@%(user)s</a>' % {"user": m.group()[1:]}, "@Osirius hello there @haha mate! @someone")
+@@ end
