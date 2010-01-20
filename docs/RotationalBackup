@@ -3,10 +3,7 @@ Rotational Backup Script
 
 A Python script for making automated rotational backups.
 
-@@python
-#!/usr/bin/env python
-
-
+@@ python
 # Rotational Backup
 # Python script for automated database backups on a daily, weekly and monthly basis
 # Supports mysqldump and pg_dump
@@ -46,11 +43,11 @@ def main():
     parser.add_option("--dump-script", dest="dump_script", help="Full path of a dump script, it overrides the default script (mysqldump or pg_dump)")
 
     (options, args) = parser.parse_args()
-    
+
     if not options.database:
         parser.error("You have to specify a database name")
-    
-    
+
+
     today = datetime.today()
     filename = "%(label)s.%(year)s.%(month)s.%(day)s.%(type)s.sql" % {
         "label": options.label,
@@ -59,65 +56,65 @@ def main():
         "month": today.month,
         "day": today.day
     }
-    
+
     filepath = os.path.join(os.path.abspath(options.output_dir), filename)
     dump_args = []
-    
+
     if options.backend == "postgre":
         if options.username:
             dump_args.append("--username=%s" % options.username)
-        
+    
         if options.password:
             dump_args.append("--password=%s" % options.password)
-        
+    
         if options.hostname:
             dump_args.append("--host=%s" % options.hostname)
-        
+    
         if options.port:
             dump_args.append("--port=%s" % options.port)
-        
+    
         if options.verbose:
             dump_args.append("-v")
-        
+    
         dump_args.append(options.database)
         dump_args.append(">> %s" % filepath)
-        
+    
         dump_script = "pg_dump"
     else:
         if options.username:
             dump_args.append("--user=%s" % options.username)
-        
+    
         if options.password:
             dump_args.append("--password=%s" % options.password)
-        
+    
         if options.hostname:
             dump_args.append("--host=%s" % options.hostname)
-        
+    
         if options.port:
             dump_args.append("--port=%s" % options.port)
-        
+    
         if options.verbose:
             dump_args.append("-v")
-        
+    
         dump_args.append(options.database)
         dump_args.append(">> %s" % filepath)
-        
+    
         dump_script = "mysqldump"
-    
-    
+
+
     if options.verbose:
         print "%s %s" % (dump_script, " ".join(map(str, dump_args)))
-    
+
     if options.dump_script:
         os.system("%s %s" % (options.dump_script, " ".join(map(str, dump_args))))
     else:
         os.system("%s %s" % (dump_script, " ".join(map(str, dump_args))))
-    
-    
+
+
     if options.compress:
         os.system("gzip --force %s" % filepath)
-    
-    
+
+
     if options.expire:
         if options.type == "daily":
             expire_days = options.expire
@@ -125,7 +122,7 @@ def main():
             expire_days = options.expire * 7
         else:
             expire_days = options.expire * 30
-        
+    
         os.system("find %s -name '*%s.sql*' -maxdepth 1 -mtime +%s -delete" % (os.path.dirname(filepath), options.type, expire_days))
 
 

@@ -5,9 +5,6 @@ A Python script that can take a resource image and apply a bunch of complex
 effects on it.
 
 @@ python
-#!/usr/bin/env python
-
-
 # Image Manipulator
 #
 # Takes a source image, applies filter images on top, then applies blur and
@@ -53,24 +50,24 @@ def image_manipulator(in_file, out_file):
     spotlight = Image.open(os.path.join(filter_dir, "spotlight.png"))
     rounded_box = Image.open(os.path.join(filter_dir, "rounded-box.png"))
     rounded_corners = Image.open(os.path.join(filter_dir, "rounded-corners.png"))
-    
+
     # Resize/crop source if necessary
     source_ratio = float(source.size[0]) / float(source.size[1])
-    
+
     if source_ratio > CANVAS_RATIO:
         source = source.resize((source.size[0] * CANVAS_HEIGHT / source.size[1], CANVAS_HEIGHT))
     elif source_ratio < CANVAS_RATIO:
         source = source.resize((CANVAS_WIDTH, source.size[1] * CANVAS_WIDTH / source.size[0]))
-    
+
     source = source.crop((0, 0, CANVAS_WIDTH, CANVAS_HEIGHT))
-    
+
     spotlight = spotlight.resize(source.size)
-    
-    
+
+
     # Paste filters on the source
     source.paste(spotlight, None, spotlight)
 
-    
+
     # Setup canvas and paste filters on it
     canvas = Image.new("RGB", source.size)
     canvas.paste(source, None)
@@ -83,8 +80,8 @@ def image_manipulator(in_file, out_file):
 
     # Place rounded corners on canvas
     canvas.paste(rounded_corners, None, rounded_corners)
-    
-    
+
+
     boxes = list()
 
     # Populate the box list in columns and rows
@@ -96,7 +93,7 @@ def image_manipulator(in_file, out_file):
     # Apply the blur filter to random boxes from the list and pop them out
     for i in range(NUM_BLUR):
         box = boxes.pop(randint(0, (len(boxes) - 1)))
-    
+
         # We have to get a larger piece here because the blur effect causes
         # smoothing on the edges
         piece = source.crop((
@@ -105,13 +102,13 @@ def image_manipulator(in_file, out_file):
             (box[0] * BOX_WIDTH) + box[0] + BOX_WIDTH + 10,
             (box[1] * BOX_HEIGHT) + box[1] + BOX_HEIGHT + 10,
         ))
-    
+
         for a in range(4):
             piece = piece.filter(ImageFilter.BLUR)
-    
+
         # Cut out the extra parts
         piece = piece.crop((10, 10, piece.size[0] - 10, piece.size[1] - 10))
-    
+
         # Paste on the source
         canvas.paste(piece, (
             (box[0] * BOX_WIDTH) + box[0],
@@ -127,7 +124,7 @@ def image_manipulator(in_file, out_file):
     for i in range(NUM_OPAQUE):
         # Don't pop the box from the list, we want to iterate over it again
         box = boxes[randint(0, (len(boxes) - 1))]
-    
+
         # Apply it to the source, not the canvas, it'll be copied later
         source.paste(opaque_mask, (
             (box[0] * BOX_WIDTH) + box[0],
@@ -145,9 +142,9 @@ def image_manipulator(in_file, out_file):
             (box[0] * BOX_WIDTH) + box[0] + BOX_WIDTH,
             (box[1] * BOX_HEIGHT) + box[1] + BOX_HEIGHT,
         )
-    
+
         piece = source.crop(box_coordinates)
-    
+
         canvas.paste(piece, box_coordinates, rounded_box)
 
 

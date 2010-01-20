@@ -4,7 +4,6 @@ JavaScript Minifier
 A Python script for minifying all JavaScript files in a given directory.
 
 @@ python
-#!/usr/bin/env python
 
 # JS Minify
 # Python script that can process all JavaScript files in a directory
@@ -22,38 +21,39 @@ def main():
         usage="Usage: %prog [options] --dir=SOURCE_DIR", 
         version="%prog 0.1"
     )
-    
+
     parser.set_defaults(
         compressor="/path/to/yuicompressor-2.4.1.jar", 
     )
-    
+
     parser.add_option("--dir", dest="dir", help="Directory to look for JavaScript files")
     parser.add_option("--compressor", dest="compressor", help="Path to the YUI Compressor jar file")
-    
+
     (options, args) = parser.parse_args()
-    
+
     if not options.dir:
         parser.error("You have to specify a directory.")
-    
+
     # Loop through all files with .js extension
     for file in [x for x in os.listdir(options.dir) if os.path.splitext(x)[1].lower() == ".js"]:
         print "Compressing %s" % file
-        
+
         # Setup the input/output paths
         input = os.path.join(options.dir, file)
         output = os.path.join(options.dir, os.path.splitext(file)[0] + ".min.js"
-        
+
         # Pass the file through the YUI Compressor, save the output as .min.js
         os.system("java -jar %(compressor)s %(input)s -o %(output)s" % {
             "compressor": options.compressor,
             "input": input,
             "output": output,
         }))
-        
+
         # Replace the original file with the minified version
         os.rename(output, input)
 
 
 if __name__ == "__main__":
     main()
+
 @@ end

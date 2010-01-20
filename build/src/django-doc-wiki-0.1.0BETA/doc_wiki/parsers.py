@@ -1,11 +1,10 @@
 import re
 
 from markdown import Markdown, TextPreprocessor
-from smartypants import smartyPants
-
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import get_lexer_by_name, TextLexer
+from smartypants import smartyPants
 
 
 class CodeBlockPreprocessor(TextPreprocessor):
@@ -40,10 +39,10 @@ class CodeBlockPreprocessor(TextPreprocessor):
         :copyright: 2007 by Jochen Kupperschmidt.
         :license: BSD, see LICENSE for more details.
     """
-    pattern = re.compile(r'@@ (.+?)\r\n(.+?)\r\n@@ end', re.S)
+    pattern = re.compile(r'@@ (.+?)\n(.+?)\n@@ end', re.S)
     
     formatter = HtmlFormatter(noclasses=False)
-    
+
     def run(self, lines):
         def repl(m):
             try:
@@ -65,7 +64,7 @@ class SmartyPantsPreprocessor(TextPreprocessor):
     ASCII punctuation characters into typographically correct versions
     """
     pattern = re.compile(r'(.+?)(@@.+?@@ end|$)', re.S)
-    
+
     def run(self, lines):
         def repl(m):
             return smartyPants(m.group(1)) + m.group(2)
