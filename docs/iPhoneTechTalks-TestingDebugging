@@ -1,0 +1,86 @@
+Testing and Debugging by Michael Jurewitz (jurewitz@apple.com)
+==============================================================
+
+## Finding and Fixing Bugs
+
+- Unit Testing
+	- Discrete pieces of code that validate behaviour
+		- Verify application behaviour
+		- Verify subsystems behave as designed
+	- Avoids reintroducing old bugs
+	- Prevents regressions
+	- Core Data
+		- Fully test driven from the start
+		- Thousands of tests run every time its compiled
+		- Allowed the team to make large changes
+	- Two different types of tests
+		- Logic tests
+			- Run in the simulator
+		- Application tests
+			- Run inside the actual application on the device
+	- Requires solid discipline
+
+- Static Analysis
+	- Power to find bugs you never even knew existed
+	- Easy to read messages
+	- Clear logical flow
+	- Strengths of static analysis
+		- Find bugs without test cases
+		- Early detection of bugs
+		- Detailed error reports
+	- Analyze both iPhone and Mac apps
+	- Focus areas
+		- Cocoa API enforcement
+		- Memory management
+		- Logic errors
+	- Uses Clang open source static analysis engine
+	- Static = don't run the program
+	- Employs deep compiler analysis
+	- Each function/method is analyzed one at a time
+	- Analyzer reasons about possible execution paths
+	- Program details are abstracted to achieve coverage
+	- Xcode workflow should be build-analyze-fix-analyze
+
+
+## Using the Organizer
+
+- Lots of features
+	- Device management
+	- Provisioning Profile management
+	- Diagnostic data
+
+- Summary View
+	- You can download, upload application data to the sandbox on the device
+	- Using the OS version dropdown, you can roll back your system version on 
+	  your test device back and forth
+
+
+## Running Beta Tests
+
+- Dealing with crashes
+	- Get the crash log from your beta tester
+	- Organizer will symbolicate crash logs for you
+	- Your .app and .dSym must be locatable by Spotlight
+		- Save the build files somewhere so they can be found when the crash 
+		  logs come in
+
+- Types of crashes
+	- Low Memory
+		- Crash log displays page count the app was using when it was jettisoned
+		- Every page is 4KB
+		- Mail, Phone, Safari, mediaserverd run in the background and consume
+		  memory, so it's normal to see them in low memory logs
+	- Application Errors
+		- Crash log displays exception type EXC_CRASH
+			- 0xdeadfa11 means low memory
+			- 0x8badf00d means application became unresponsive
+		- Thread that crashed is also shown below with a stack trace
+
+- Crash reports will also be available on iTunesConnect
+
+
+## Fixing Crashes
+
+- Instruments
+	- Has many templates to catch specific bugs
+	- Zombies template can be used to catch references to released objects

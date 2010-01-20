@@ -1,0 +1,188 @@
+Effective iPhone Development by Lawrence Coopet
+===============================================
+
+## Agenda: Implementation Realities
+
+- UITableView
+- UIImage
+- Adding concurrency with NSOpeartion
+- Working with system view hierarchies
+
+
+## What makes it effective?
+
+- Flexible
+	- You know it's going to work every time, solid
+	- Easy to update, add features
+
+- Robust
+	- Handles weird edge cases effectively
+
+- Efficient
+	- No wasting of memory
+
+- Ability to leverage OS to the fullest
+	- Leverage the OS so you can be lazy
+	- Take advantage of already available frameworks
+		- Know what's available
+		- Know how to properly use them
+
+
+## UITableView
+
+- Scrolling performance issues
+	- UIKit is fully and pervasively composited
+	- It impacts how you write your code
+	- Ripple effect, make sure to use transparency properly
+		- All non-opaque elements are composited
+	- UI complexity impacts performance all over the interface
+	- Simplify the UI:
+		- Stay focused
+		- Drill down on data
+		- Flatten drawing with a custom view
+			- Create custom UIView that draws all components together
+			- Less views to composite
+		- Minimize drawing
+			- Use setNeedsDisplayInRect
+			- Respect incoming rect in drawRect (only redraw affected area)
+		- Understand and respect OS drawing policies
+			- view.opaque is YES by default, for a reason
+			- Never call drawRect directly, use setNeedsDisplay
+		- Derived objects should be aware of their responsibilities
+			- Implement setHighlighted and highlighted properly
+		- Trust UIKit to do the right thing
+			- No need to poll for state
+			- System will set your state, simply implement
+
+
+## UIImage
+
+- Different loading methods:
+	- imageNamed:
+		- Decompression is immediate
+		- Cached
+	- imageWithContentsOfFile:
+		- Decompression is on demand
+		- NOT cached
+
+- Choose the appropriate API based on context
+
+- Use imageNamed for:
+	- UI components
+	- Images used repeatedly (buttons, tableviews, imageviews, etc.)
+	- Avoid loading many at once
+		- imageNamed does a block and load
+		- Can slow app or view loading
+	- iPhone OS uses imageNamed to load nib referenced images
+		- Make sure there aren't many images in nibs
+
+- Use imageWithContentsOfFile:
+	- Any image that will not be needed immediately
+	- Images used infrequently or rarely
+		- Avoid image cache pressure for something that might or might not be used
+	- All non-resource bundle images
+		- It may be used for bundle resources that you want to use latently
+
+- UIImage is wrapping CGImage
+	- It's part of CoreGraphics, which provides a much wider and deeper set of functionality
+	- All high level wrappers are like this
+		- CGImageRef is directly accessible from a UIImage object
+
+
+## Adding Concurrency with NSOperation (Threading)
+
+- Doing more than one thing at once
+	- Keep the UI responsive
+	- Leverage idle resources
+	- Doesn't matter if the device is single core, there are always idle resources available
+	- Be ready for the future, iPhone will be multi-core in the near future
+
+- Where to use?
+	- Intensive computation
+		- Parsing
+		- Image manipulations
+	- Significant disK IO
+		- Accessing large data sets (non-uniform data)
+		- Importing data
+	- Instrument before you decide
+		- Make sure you can give CPU enough work
+		- If there is not enough work, it may have an adverse effect
+
+- Where to avoid?
+	- Networking
+		- High latency
+		- Use asynchronous API's instead of threading
+			- System handles concurrency for you
+			- Avoid blocking (synchronous) API's for network tasks
+	- Reachability
+		- Also has asynchronous API's
+	- Idle behaviours
+		- Use NSTimer instead, don't use threads
+		- Frequency triggers don't need separate threads
+
+- Thread Confinement
+	- Keep object access confined to one thread
+	- Forget about sync points, blocking
+	- NSOperation encapsulates everything needed for a single task
+		- Code & Data
+		- State (isExecuting, isFinished, isCancelled)
+		- Dependencies
+		- Priority
+	- Easy to add to existing code
+		- Refactor to make sure sequential, big chunks of code don't exist
+
+- Easy, but you still have to write code
+	- Subclass NSOperation and override one method - main
+	- Create the operation
+		- Give it the data it needs to do its work, NOT shared data
+		- Transfer ownership of the data
+	- Create a NSOperationQueue and add operations to it
+	- As tasks are complete, delegate is called
+	- Sending notifications is another option (for one to many situations)
+
+- UIKit is not thread safe (can only run on the main thread)
+	- Use performSelectorOnMainThread:withObject:waitUntilDone: for moving execution to (main) UI thread for UI updates
+
+- Architectural Relevance
+	- Remove dependencies on sequential code flow
+
+
+## Caveats
+
+- UIKit can only be safely used on the main thread
+	- Never modify UI state directly from inside an operation
+	- Move execution to the main thread for UI updates
+
+- Transfer data ownership
+	- Sharing data between threads is generally a bad idea
+	- Mutable objects are not thread safe
+
+- One object - one thread
+	- Be careful with [NSThread detachNewThreadSelector... toTarget:self] and [NSInvocationOperation initWithTarget:self]
+
+
+## Working with System View Hierarchies
+
+- All SDK provided high level views are private, they might change
+
+- Override UIWindow sendEvent if you need to extend functionality
+	- Insert yourself into the event chain by overriding sendEvent
+	- Use an event independent mechanism (delegation)
+	- Call super FIRST
+	- Look but don't modify
+	- Be quick about it
+
+- UIImagePickerController in OS 3.1
+	- Hide standard UI items
+	- Add your own overlay view hierarchy
+	- Programmatically takePicture
+
+- Update your code
+	- Do not hack the view hierarchy
+
+- Be a good OS client
+	- Avoid unsupported territory
+	- Plan ahead
+	- Spend time with the docs
+		- Is there a delegate or notification mechanism for what I want?
+	- Take advantage of the high level API's first, then look deeper, experiment

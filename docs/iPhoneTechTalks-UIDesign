@@ -1,0 +1,193 @@
+iPhone UI Design Essentials by Eric Hope (ehope@apple.com)
+==========================================================
+
+## Elegant Solution
+
+- Solve an actual problem
+- Solve it elegantly
+- Leave out anything that's not needed
+
+
+## Clearly Defined Style
+
+- Serious Tool:
+	- Minimal graphics
+	- Complex hierarchy
+	- Keep it clean with alignment (everything is readable at a glance: colors, alignment, fonts, etc.)
+	- Avoid visual redundancy
+		- If something occurs more than twice on the screen, take it out (My Photos -> Photos, etc.)
+	- Visually prioritize (important things should be at the top)
+
+- Fun Tool:
+	- Moderately graphically rich
+		- Usually content is provided
+	- Simple information hierarchy
+
+- Fun Entertainment
+	- Intensely graphical
+		- Don't use standard navigation controls
+	- Rarely hierarchical
+		- Make the game easily reachable and playable, you don't know how much time the user has
+	- Multitouch centric
+		- It's natural to try and use two thumbs, multitouch should be available (more than one point of interaction)
+	- Loud visual feedback
+		- Give visual and audible rewards (bling), level of engagement will go up
+
+- Serious Entertainment
+	- Moderately graphical
+	- Moderately hierarchical
+	- Content consumption focused
+
+- Utility
+	- Graphically rich
+		- Much like single use appliances, should be well designed to be successful
+		- Easily legible from far away
+	- Single screen
+	- Efficiency focused
+		- Large buttons
+		- They are usually used in a hurry
+
+
+## Great Usability
+
+- Solid application hierarchy
+	- Very linear (one door to one room)
+	- Web modal doesn't work in a mobile app context (links from anywhere to everywhere)
+	- Drill down a specific path
+- Clean layout
+	- More than just using padding and alignment
+	- Good layout gives impression of stability
+- Finger sized targets
+	- 44px by 44px (on average)
+	- 44px by 22px (never stacked vertically)
+
+
+## Gorgeous Application Icon
+
+- Legibility is paramount
+	- As few distinct objects as possible
+	- Clearly defined silhouette
+	- Human eye parses shapes first
+	- Don't put words inside of the icon, unless there is a good reason
+- High quality art is a must
+	- It should be as good when it's blown up to poster size
+	- Lots of details
+- Great icons tell a story
+	- Personable
+	- Suggests what the app is about
+- Icon is the first and last impression
+	- Should be professional
+
+
+## High Fidelity UI
+
+- Making it "iPhone-like"
+	- Nail the basics first, then move on to adding polish
+- Read the HIG
+	- Don't treat it as a quick reference, really read through
+	- Understand the essence of why a specific element was made for, then you can customize it
+- Build a brand, tell a story
+- Employ tactile design
+	- Design elements that you would want to touch in the real world
+	- Use rich materials (leather, metal, etc.), they don't cost you anything extra
+- Hire, contract or become a designer
+- Start with paper prototypes
+	- Always begin by drawing on a piece of paper
+	- Don't write UI code until you prototyped every screen
+
+
+## Dynamic Content
+
+- Every application needs a pulse
+	- Without dynamic content, apps have a very short shelf life
+	- Most apps on the mac are user-centric serious tools, so the burden of providing content is on the user
+	- Combat staleness by providing an area that constantly changes in the app, people will relaunch it
+- People love freshness
+	- Make the app continually change
+- People love improvement
+	- Continous updates make people follow your app more
+	- People read the update release notes, make sure you include lots of data in there
+	- Add new features or little gems, then make people traverse the app to reach it
+- People love people
+	- High score boards, badges, trophies
+	- Social communities can spring up around any topic, people love to share
+	- Use social networking components (Facebook Connect, etc.)
+- Use in-app purchase
+	- Create a customized, attractive store
+	- Don't underestimate people's interest in something they invested money for
+- Always display the cost
+- Give detailed descriptions
+- Group items according to type
+- Indicate when items are consumable
+- Provide a "Check for purchases" button
+	- If people change devices, they shouldn't lose the content they already bought
+
+
+## Add Animation
+
+- More realistic, approchable, fun
+- Clarifies a process or concept
+- Reflects result of action
+	- Deleting
+	- Moving
+	- Revealing
+	- Purchasing
+	- Changing
+	- Selecting
+	- Customizing
+- Use animation to:
+	- Enhance a task
+- Avoid:
+	- Animating everything
+	- Gratuitous animation
+	- Distracting from the main task
+
+
+## Sound, the forgotten frontier
+
+- Sound can increase value
+	- Sound can motivate the user
+- Can reduce visual notice
+	- Instead of animations, use sound to give feedback
+- Must be relevant
+	- If there is sound in one part of the app, make sure the rest follows
+- Must be symmetrical
+	- If a drawer makes a sound when it comes up, it should make a symmetrical sound when it goes down
+- Make sure to have high quality sound
+	- Especially for push notifications
+
+
+## Polish
+
+- Landscape mode
+	- Often overlooked
+	- Under the age of 25, most people use the device vertically
+	- But over the age of 25 most people prefer landscape mode
+- Contextual Interface Elements
+	- Don't use the alert dialogs for everything, it should be for errors, or very important messages
+	- Be subtle when giving visual feedback, especially if it's not essential
+- Search and scope controls
+- Spotlight and settings icons
+	- 29px by 29px for spotlight icons
+	- 57px by 57px for springboard icons
+- Push notifications
+	- Make sure it's sensible, don't notify the user for everything
+	- Make sure it's done right from the very beginning
+- Copy and paste
+- Undo and redo
+	- Don't let people accidentally undo things they can't take back
+	- If undo is destructive, warn the user
+
+
+## Application Definition Statement
+
+- Avoid developing from lists of features
+	- Don't cram a list of specs into one app
+	- Define a solution
+- ADS:
+	- (Your differentiator) (your solution) for (your audience)
+		i.e. Photos: Easy to use digital photo sharing for casual iPhone users
+			 Aperture: Easy to use digital photo sharing for professional Mac users
+- Feature filtering:
+	- Pick the few features, most frequently used, by the majority of your users, most appropriate for the mobile platform
+	- If a feature doesn't make it through this filter, let it go
