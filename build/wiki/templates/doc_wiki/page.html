@@ -5,4 +5,6 @@
 
 {% block content %}
 {{ page.content_html }}
+
+<p><a href="{% url doc_wiki_page_source slug=page.slug %}">Download this file</a></p>
 {% endblock %}
