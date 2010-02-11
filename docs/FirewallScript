@@ -1,0 +1,102 @@
+#!/bin/sh
+#
+# $Id$
+
+flt="/sbin/iptables"
+forwarding="0"
+
+trapeze="209.202.125.138 209.202.125.139 64.34.25.4"
+
+filter_input () {
+    echo -e "  - Input...                 \c"
+    $flt -A INPUT -i lo -j ACCEPT
+    $flt -A INPUT -p icmp -j ACCEPT
+    $flt -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+    for ip in $trapeze
+    do
+        $flt -A INPUT -p tcp -s $ip --dport 22 --syn -j ACCEPT
+    done
+    $flt -A INPUT -p tcp --dport 80 --syn -j ACCEPT
+    echo "Ok"
+    }
+
+filter_output () {
+    echo -e "  - Output...                \c"
+    $flt -A OUTPUT -j ACCEPT # accept everything
+    echo "Ok"
+    }
+
+filter_forward () {
+    $flt -A FORWARD -j DROP
+    }
+
+filter_nat () {
+    echo "NAT rules empty"
+}
+
+start () {
+    modprobe ip_conntrack
+    modprobe ip_conntrack_ftp
+    filter_input
+    filter_output
+    filter_nat
+    if [ "$forwarding" = "1" ]
+    then
+        filter_forward
+        echo "1" > /proc/sys/net/ipv4/ip_forward
+        echo "forward enabled"
+    else 
+        echo "forward disabled"
+        echo "0" > /proc/sys/net/ipv4/ip_forward
+    fi
+    $flt -P INPUT DROP
+    $flt -P FORWARD DROP
+    $flt -P OUTPUT DROP
+    }
+
+stop () {
+  $flt -P INPUT ACCEPT
+  $flt -P FORWARD ACCEPT
+  $flt -P OUTPUT ACCEPT
+  $flt -F
+  $flt -F -t nat
+  $flt -F -t mangle
+  $flt -X
+    }
+
+case "$1" in
+    start|restart)
+    echo -e "\033[1;31m Start firewall \033[0m"
+        stop
+        start
+        ;;
+    stop)
+    echo -e "\033[1;31m Stop firewall \033[0m"
+        stop
+        ;;
+    status)
+        clear
+        $flt -L -v -n | less
+        clear
+        echo -e "\n\nNAT\n\n"
+        $flt -L -v -t nat | less
+        clear
+        echo -e "\n\nMANGLE\n\n"
+        $flt -L -v -t mangle | less
+        ;;
+    test)
+        echo -e "\033[1;31mTest during 20s\033[0m"
+        stop
+        start
+        sleep 20
+        stop
+        echo -e "\033[1;31mStop firewall\033[0m"
+        ;;
+    *)
+        echo -e "\033[1;31mUsage "$0" {start|stop|restart|test}\033[0m"
+        exit 1
+        ;;
+esac
+
+exit 0
+

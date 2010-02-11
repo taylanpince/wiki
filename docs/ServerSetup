@@ -1,0 +1,212 @@
+Server Setup Instructions
+=========================
+
+# Change the root password
+passwd
+
+# Add a user for the team
+adduser <username>
+
+# Add this user to the list of sudoers so it has sudo access
+visudo
+# Add the following to the bottom of the file:
+# <username>  ALL = NOPASSWD:ALL
+
+# Add server to your ssh config file
+# Logout as root, login as username, make sure sudo su is working
+
+# Cleanup sources.list
+cd /etc/apt
+sudo mv sources.list sources.list.bak
+wget http://wiki.taylanpince.com/UbuntuSourcesList/source/
+sudo mv UbuntuSourcesList sources.list
+
+# Perform updates
+sudo aptitude update
+sudo aptitude dist-upgrade
+
+# If there is a kernel update, restart the server
+sudo reboot
+
+# Fix locales issue (slicehost only)
+sudo locale-gen en_CA.UTF-8
+sudo update-locale LANG=en_CA.UTF-8
+
+# Ensure that it worked
+cat /etc/default/locale
+
+## Set the proper time
+sudo dpkg-reconfigure tzdata
+
+# Install basic tools
+sudo aptitude install vim
+
+# Install monitoring softwares
+sudo aptitude install logcheck cron-apt exim4-daemon-light monit
+
+# Correct logcheck filter for syslogd messages
+sudo vim /etc/logcheck/ignore.d.server/syslogd
+
+    ^\w{3} [ :0-9]{11} [._[:alnum:]-]+ ntpd\[[0-9]+\]: kernel time sync error 0001$
+
+# Add email addresses to aliases file
+sudo vim /etc/aliases
+
+# Add the following line to the end of the file:
+# root: <your@email.com>
+
+# Configure Exim (the mail server)
+sudo dpkg-reconfigure exim4-config
+
+# Use the following settings:
+1. Choose: "internet site; mail is sent and received directly using SMTP"
+2. Enter the domain of the site: <domain>
+3. Use the default: "127.0.0.1"
+4. Enter the domain of the site: <domain>
+5. Domains to relay mail for: (leave blank)
+6. Machines to relay mail for: (leave blank)
+7. Keep number of DNS-queries minimal (default: No)
+8. Delivery method for local mail: (default: mbox format in /var/mail/)
+9. Split configuration into small files? (default: No)
+
+# Test the exim configuration
+sudo exim4 -bt root
+
+# This should trace the route for sending an email to root
+
+# Note: Since exim is the default mail program,
+# the mail log will be /var/log/exim4/mainlog
+# You can examine this file if there are any issues.
+
+# Test that you are able to receive mail
+# The recipient email will be the one set in the /etc/aliases file
+mail root
+
+# Type the subject <enter> the body <enter> and .<enter> on a empty line
+
+# Configure cron-apt (this program performs auto updates of ubuntu packages)
+# By default it only downloads updates, but doesn't install them.
+# We will instruct cron-apt to install the updates as well.
+sudo cp /etc/cron-apt/action.d/3-download /etc/cron-apt/action.d/4-update
+sudo vim /etc/cron-apt/action.d/4-update
+
+# Remove the -d option from the dist-upgrade command. It should look like:
+dist-upgrade -y -o APT::Get::Show-Upgraded=true
+
+# Tell cron-apt to use aptitude for the updates (by default it uses apt-get)
+sudo vim /etc/cron-apt/config
+
+# Uncomment the line: APTCOMMAND=/usr/bin/aptitude
+
+# Install our recommended softwares for Django
+sudo aptitude install apache2-mpm-worker postgresql python-psycopg2 python-imaging ipython libapache2-mod-wsgi cronolog
+
+# Install nginx
+sudo aptitude install libpcre3 libpcre3-dev libpcrecpp0 libssl-dev zlib1g-dev
+mkdir ~/sources
+cd ~/sources
+wget <latest nginx from http://nginx.org/>
+tar -xzvf nginx-*.tar.gz
+rm -f *.tar.gz
+cd nginx-*
+./configure --sbin-path=/usr/local/sbin --with-http_ssl_module
+make
+sudo make install
+
+# Install nginx start/stop script
+cd /etc/init.d
+sudo wget http://wiki.taylanpince.com/NginxStartStopScript/source/
+sudo mv NginxStartStopScript nginx
+sudo chmod +x nginx
+sudo /usr/sbin/update-rc.d -f nginx defaults
+sudo /etc/init.d/nginx start
+
+# Create Debian conf layout for nginx
+sudo mkdir /usr/local/nginx/sites-available
+sudo mkdir /usr/local/nginx/sites-enabled
+sudo wget http://wiki.taylanpince.com/NginxConf/source/
+sudo mv NginxConf nginx.conf
+
+# Configure the firewall
+cd /etc/init.d
+sudo wget http://wiki.taylanpince.com/FirewallScript/source/
+sudo mv FirewallScript firewall.sh
+sudo chmod +x firewall.sh
+
+# You can now test that the firewall allows you to get it, by running the
+# following command (which will run the firewall for 20 seconds only):
+sudo /etc/init.d/firewall.sh test
+
+# In a separate terminal window trying to ssh to the server
+ssh <username>@<server-ip-address>
+
+# If you are able to get in, then the firewall is ok.
+
+# Now you can actually start the firewall (permanently)
+sudo /etc/init.d/firewall.sh start
+
+# Add the firewall it to the startup routine
+sudo update-rc.d firewall.sh defaults
+
+# OPTIONAL:
+# Install munin and associated programs
+sudo aptitude install munin libwww-perl smartmontools
+
+sudo ln -s /usr/share/munin/plugins/apache_accesses /etc/munin/plugins/
+sudo ln -s /usr/share/munin/plugins/apache_volume /etc/munin/plugins/
+sudo /etc/init.d/munin-node restart
+
+# Go to http://<server-ip-address>/munin and make sure munin is working
+
+
+Deployment
+----------
+
+# Update apache settings to use local port 80 only
+
+# Remove Apache's default "It Works" message
+sudo rm /var/www/index.html
+sudo touch /var/www/index.html
+
+# Create a postgres database and user for the django project
+# Note: postgres installation automatically creates a UNIX user called postgres
+# This UNIX user is the equivalent of mysql "root" user. You need to sudo to
+# this user to perform psql functions.
+
+# When creating the new user:
+
+sudo su postgres
+createuser --createdb --no-createrole --no-superuser --pwprompt <username>
+createdb <db> --owner <username>
+exit
+
+# Create a folder for sites and any projects that will be hosted
+cd ~
+mkdir sites
+mkdir sites/<projectname>
+
+# Create user in htpasswd file if needed
+htpasswd -c ~/hosting/<serverfolder>/htpasswd guest
+/etc/init.d/apache2 restart
+
+# Configure monit
+cd /etc/monit
+sudo mv monitrc monitrc.bak
+sudo wget http://wiki.taylanpince.com/MonitConf/source/
+sudo mv MonitConf monitrc
+
+# Edit /etc/default/monit to tell it to start (when executed)
+sudo vi /etc/default/monit
+# Change startup=0 to startup=1
+
+# '/etc/monit/monitrc' must have permissions no more than -rwx------ (0700);
+sudo chmod 700 /etc/monit/monitrc
+
+# Check that the configuration file is ok
+sudo monit -t
+
+# Now start monit
+sudo /etc/init.d/monit start
+
+# Make sure monit is working properly
+w3m http://127.0.0.1:2812
