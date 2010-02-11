@@ -15,6 +15,10 @@ visudo
 # Add server to your ssh config file
 # Logout as root, login as username, make sure sudo su is working
 
+# Disable ssh root login
+sudo vim /etc/ssh/sshd_config
+# Set PermitRootLogin no
+
 # Cleanup sources.list
 cd /etc/apt
 sudo mv sources.list sources.list.bak
@@ -95,14 +99,13 @@ dist-upgrade -y -o APT::Get::Show-Upgraded=true
 
 # Tell cron-apt to use aptitude for the updates (by default it uses apt-get)
 sudo vim /etc/cron-apt/config
-
 # Uncomment the line: APTCOMMAND=/usr/bin/aptitude
 
-# Install our recommended softwares for Django
+# Install server software
 sudo aptitude install apache2-mpm-worker postgresql python-psycopg2 python-imaging ipython libapache2-mod-wsgi cronolog
 
 # Install nginx
-sudo aptitude install libpcre3 libpcre3-dev libpcrecpp0 libssl-dev zlib1g-dev
+sudo aptitude install libpcre3 libpcre3-dev libpcrecpp0 libssl-dev zlib1g-dev make
 mkdir ~/sources
 cd ~/sources
 wget <latest nginx from http://nginx.org/>
@@ -119,13 +122,15 @@ sudo wget http://wiki.taylanpince.com/NginxStartStopScript/source/
 sudo mv NginxStartStopScript nginx
 sudo chmod +x nginx
 sudo /usr/sbin/update-rc.d -f nginx defaults
-sudo /etc/init.d/nginx start
 
 # Create Debian conf layout for nginx
 sudo mkdir /usr/local/nginx/sites-available
 sudo mkdir /usr/local/nginx/sites-enabled
+cd /usr/local/nginx/conf
 sudo wget http://wiki.taylanpince.com/NginxConf/source/
 sudo mv NginxConf nginx.conf
+sudo wget http://wiki.taylanpince.com/NginxProxyConf/source/
+sudo mv NginxConf proxy.conf
 
 # Configure the firewall
 cd /etc/init.d
@@ -163,10 +168,11 @@ Deployment
 ----------
 
 # Update apache settings to use local port 80 only
-
-# Remove Apache's default "It Works" message
-sudo rm /var/www/index.html
-sudo touch /var/www/index.html
+sudo vim /etc/apache/ports.conf
+# Change first line to Listen 127.0.0.1:80
+# Restart Apache
+sudo /etc/init.d/apache stop
+sudo /etc/init.d/apache start
 
 # Create a postgres database and user for the django project
 # Note: postgres installation automatically creates a UNIX user called postgres
@@ -174,7 +180,6 @@ sudo touch /var/www/index.html
 # this user to perform psql functions.
 
 # When creating the new user:
-
 sudo su postgres
 createuser --createdb --no-createrole --no-superuser --pwprompt <username>
 createdb <db> --owner <username>
