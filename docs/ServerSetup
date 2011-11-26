@@ -14,16 +14,29 @@ visudo
 
 # Add server to your ssh config file
 # Logout as root, login as username, make sure sudo su is working
+# Setup SSH keys
+scp ~/.ssh/id_dsa.pub <server>:~/
+ssh <server>
+mkdir .ssh
+touch .ssh/authorized_keys
+cat id_dsa.pub >> .ssh/authorized_keys
+# Logout and login again to confirm that password is no longer needed
+
+# Setup password-less login
+sudo groupadd sshers
+sudo usermod -a -Gsshers <username>
+sudo vim /etc/ssh/sshd_config
+# Set X11Forwarding no
+# Add UseDNS no
+# Add AllowGroups sshers
+sudo /etc/init.d/ssh restart
+# Once again confirm that login works fine
 
 # Disable ssh root login
 sudo vim /etc/ssh/sshd_config
 # Set PermitRootLogin no
-
-# Cleanup sources.list
-cd /etc/apt
-sudo mv sources.list sources.list.bak
-wget http://wiki.taylanpince.com/UbuntuSourcesList/source/
-sudo mv UbuntuSourcesList sources.list
+# Set PasswordAuthentication no
+sudo /etc/init.d/ssh restart
 
 # Perform updates
 sudo aptitude update
@@ -43,10 +56,10 @@ cat /etc/default/locale
 sudo dpkg-reconfigure tzdata
 
 # Install basic tools
-sudo aptitude install vim
+sudo aptitude install vim git-core
 
 # Install monitoring softwares
-sudo aptitude install logcheck cron-apt exim4-daemon-light monit
+sudo aptitude install logcheck cron-apt exim4-daemon-light
 
 # Correct logcheck filter for syslogd messages
 sudo vim /etc/logcheck/ignore.d.server/syslogd
@@ -102,36 +115,16 @@ sudo vim /etc/cron-apt/config
 # Uncomment the line: APTCOMMAND=/usr/bin/aptitude
 
 # Install server software
-sudo aptitude install apache2-mpm-worker postgresql python-psycopg2 python-imaging ipython libapache2-mod-wsgi cronolog
+sudo aptitude install apache2-mpm-worker postgresql python-psycopg2 libapache2-mod-wsgi cronolog
 
 # Install nginx
-sudo aptitude install libpcre3 libpcre3-dev libpcrecpp0 libssl-dev zlib1g-dev make
-mkdir ~/sources
-cd ~/sources
-wget <latest nginx from http://nginx.org/>
-tar -xzvf nginx-*.tar.gz
-rm -f *.tar.gz
-cd nginx-*
-./configure --sbin-path=/usr/local/sbin --with-http_ssl_module
-make
-sudo make install
+sudo aptitude install nginx
+cd /etc/nginx
+sudo mv nginx.conf nginx.conf.bak
+sudo wget http://wiki.taylanpince.com/NginxConf/source/ -O nginx.conf
+sudo wget http://wiki.taylanpince.com/NginxProxyConf/source/ -O proxy.conf
 
-# Install nginx start/stop script
-cd /etc/init.d
-sudo wget http://wiki.taylanpince.com/NginxStartStopScript/source/
-sudo mv NginxStartStopScript nginx
-sudo chmod +x nginx
-sudo /usr/sbin/update-rc.d -f nginx defaults
-
-# Create Debian conf layout for nginx
-sudo mkdir /usr/local/nginx/sites-available
-sudo mkdir /usr/local/nginx/sites-enabled
-cd /usr/local/nginx/conf
-sudo wget http://wiki.taylanpince.com/NginxConf/source/
-sudo mv NginxConf nginx.conf
-sudo wget http://wiki.taylanpince.com/NginxProxyConf/source/
-sudo mv NginxConf proxy.conf
-
+# OPTIONAL:
 # Configure the firewall
 cd /etc/init.d
 sudo wget http://wiki.taylanpince.com/FirewallScript/source/
@@ -163,16 +156,24 @@ sudo /etc/init.d/munin-node restart
 
 # Go to http://<server-ip-address>/munin and make sure munin is working
 
+# Install virtualenv, setuptools, pip
+
+sudo aptitude install python-setuptools
+sudo easy_install virtualenv
+
+# Generate ssh key
+ssh-keygen -t rsa -C "taylanpince@gmail.com"
+
 
 Deployment
 ----------
 
 # Update apache settings to use local port 80 only
-sudo vim /etc/apache/ports.conf
+sudo vim /etc/apache2/ports.conf
 # Change first line to Listen 127.0.0.1:80
 # Restart Apache
-sudo /etc/init.d/apache stop
-sudo /etc/init.d/apache start
+sudo /etc/init.d/apache2 stop
+sudo /etc/init.d/apache2 start
 
 # Create a postgres database and user for the django project
 # Note: postgres installation automatically creates a UNIX user called postgres
@@ -188,11 +189,37 @@ exit
 # Create a folder for sites and any projects that will be hosted
 cd ~
 mkdir sites
-mkdir sites/<projectname>
+cd sites
+
+# Setup virtual environment, install pip
+virtualenv <projectname>
+cd <projectname>
+source bin/activate
+easy_install pip
+
+# Check out the project
+mkdir src
+cd src
+git clone <project_repo_url>
+
+# Install project requirements
+pip install -r src/<projectname>/conf/requirements.pip
+
+# Copy manage.py to bin for easy access
+cd bin
+ln -s ../src/<projectname>/web/<projectname>/manage.py
+chmod +x manage.py
 
 # Create user in htpasswd file if needed
 htpasswd -c ~/hosting/<serverfolder>/htpasswd guest
 /etc/init.d/apache2 restart
+
+# Update PostgreSQL settings
+sudo vim /etc/postgresql/8.4/main/pg_hba.conf
+# Comment out lines that start with host
+# Change second local setting to "password"
+
+
 
 # Configure monit
 cd /etc/monit

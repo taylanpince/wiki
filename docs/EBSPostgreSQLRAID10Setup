@@ -1,0 +1,11 @@
+sudo aptitude install mdadm
+sudo aptitude install -y xfsprogs
+
+sudo mdadm -v --create /dev/md0 --level=raid10 --raid-devices=4 /dev/sda2 /dev/sdb1 /dev/sdc1 /dev/sdd1
+sudo modprobe xfs
+sudo mkfs.xfs /dev/md0
+sudo ln /dev/md0 /dev/sdf
+
+echo "/dev/sdf /data xfs noatime 0 0" | sudo tee -a /etc/fstab
+sudo mkdir /data
+sudo mount /data

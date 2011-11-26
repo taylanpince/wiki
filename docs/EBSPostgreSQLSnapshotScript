@@ -1,0 +1,14 @@
+#!/bin/bash
+
+source /etc/environment
+
+EC2_CERT_PATH='/home/ubuntu/.ec2/cert-OIDYQDSTKIMU5UNH5LK5TEHBLCE2XK2C.pem'
+EC2_KEY_PATH='/home/ubuntu/.ec2/pk-OIDYQDSTKIMU5UNH5LK5TEHBLCE2XK2C.pem'
+
+SNAPSHOT_NAME=$(date +%m-%d-%Y)
+
+sudo -u postgres psql --command "SELECT pg_start_backup('$SNAPSHOT_NAME');"
+
+ec2-create-snapshot -K $EC2_KEY_PATH -C $EC2_CERT_PATH -d $SNAPSHOT_NAME $1
+
+sudo -u postgres psql --command "SELECT pg_stop_backup();"

@@ -1,0 +1,40 @@
+from boto.route53.connection import Route53Connection
+from boto.route53.record import ResourceRecordSets
+
+conn = Route53Connection(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+
+conn.get_all_hosted_zones()
+conn.create_hosted_zone("pokersmith.net.")
+conn.get_hosted_zone("Z3I9R8XJUFJ4SS")
+
+changes = ResourceRecordSets(conn, "Z3I9R8XJUFJ4SS")
+change = changes.add_change("CREATE", "pokersmith.net.", "A")
+change.add_value("50.19.235.137")
+changes.commit()
+
+for set in conn.get_all_rrsets("Z3I9R8XJUFJ4SS"):
+    print "\t%s: %s %s @ %s" % (set.name, set.type, set.resource_records, set.ttl)
+
+changes = ResourceRecordSets(conn, "ZQERXAGV3K49P")
+change = changes.add_change("CREATE", "static.choco-locate.com.", "A")
+change.add_value("174.129.16.192")
+change = changes.add_change("CREATE", "www.choco-locate.com.", "A")
+change.add_value("174.129.16.192")
+change = changes.add_change("CREATE", "mail.choco-locate.com.", "CNAME", ttl=86400)
+change.add_value("ghs.google.com.")
+changes.commit()
+
+changes = ResourceRecordSets(conn, "ZQERXAGV3K49P")
+change = changes.add_change("CREATE", "choco-locate.com.", "MX", ttl=86400)
+change.add_value("10 ASPMX.L.GOOGLE.COM.")
+change.add_value("20 ALT1.ASPMX.L.GOOGLE.COM.")
+change.add_value("20 ALT2.ASPMX.L.GOOGLE.COM.")
+change.add_value("30 ASPMX2.GOOGLEMAIL.COM.")
+change.add_value("30 ASPMX3.GOOGLEMAIL.COM.")
+change.add_value("30 ALT5.ASPMX.L.GOOGLE.COM.")
+change.add_value("30 ALT4.ASPMX.L.GOOGLE.COM.")
+
+changes = ResourceRecordSets(conn, "ZQERXAGV3K49P")
+change = changes.add_change("CREATE", "choco-locate.com.", "TXT", ttl=86400)
+change.add_value('"google-site-verification=sViC1BRfv6KpyYtpu7xi2pGjPmC1d5bvMbMNmvLLM7c"')
+changes.commit()

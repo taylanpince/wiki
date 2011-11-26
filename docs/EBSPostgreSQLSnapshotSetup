@@ -1,0 +1,51 @@
+# Setup EBS volume with XFS
+# First create EBS volume from AWS console and attach it to the instance
+
+sudo aptitude install -y xfsprogs
+sudo modprobe xfs
+sudo mkfs.xfs /dev/sdf
+echo "/dev/sdf /data xfs noatime 0 0" | sudo tee -a /etc/fstab
+sudo mkdir /data
+sudo mount /data
+
+# Change PostgreSQL data directory from conf
+# Setup PITR for PostgreSQL
+
+sudo vim /etc/postgresql/8.4/main/postgresql.conf
+
+# data_directory = '/data/postgresql'
+# archive_mode = on
+# archive_command = 'cp -i %p /data/wal/%f </dev/null'
+
+# If necessary, stop PostgreSQL and move data directory, then start it up again
+
+sudo /etc/init.d/postgresql-8.4 restart
+
+sudo mkdir /data/wal
+sudo chown -R postgres:postgres /data/wal
+
+# Install EC2 API Tools
+
+sudo vim /etc/apt/sources.list
+
+# Change all universe entries to multiverse
+
+sudo aptitude update
+sudo aptitude install ec2-api-tools
+
+# Generate key/certificate from AWS console and upload to server under ~/.ec2
+
+ec2-describe-volumes -K ~/.ec2/pk-OIDYQDSTKIMU5UNH5LK5TEHBLCE2XK2C.pem -C ~/.ec2/cert-OIDYQDSTKIMU5UNH5LK5TEHBLCE2XK2C.pem
+
+# Make a note of the volume ID of the database EBS volume
+
+# Upload & run snapshot-postgresql script
+
+snapshot-postgresql VOLUME_ID
+
+# Setup crontab with snapshot call
+
+crontab -e
+
+# 0   4   *   *   *   /usr/local/bin/snapshot-postgres-db > /home/ubuntu/logs/backup.log
+# 0   4   *   *   *   /usr/local/bin/snapshot-postgres-db > /dev/null 2>&1
