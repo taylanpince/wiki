@@ -1,0 +1,34 @@
+#!/usr/bin/env python
+
+from boto.ec2.connection import EC2Connection
+from datetime import datetime, timedelta
+
+
+AWS_ACCOUNT_ID = '9928-9599-8137'
+AWS_ACCESS_KEY_ID = 'AKIAJLB7UT6FBRUXQRJQ'
+AWS_SECRET_ACCESS_KEY = '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'
+SNAPSHOT_EXPIRY_OFFSET_DAYS = 7
+
+
+def main():
+    """
+    Deletes old snapshots
+    """
+    total_deleted = 0
+    conn = EC2Connection(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+    snapshots = conn.get_all_snapshots(owner=AWS_ACCOUNT_ID)
+    expiry_date = datetime.now() - timedelta(days=SNAPSHOT_EXPIRY_OFFSET_DAYS)
+
+    for snapshot in snapshots:
+        timestamp = datetime.strptime(snapshot.start_time[:-5], "%Y-%m-%dT%H:%M:%S")
+
+        if timestamp < expiry_date:
+            snapshot.delete()
+
+            total_deleted += 1
+
+    print "Deleted %d snapshots" % total_deleted
+
+
+if __name__ == "__main__":
+    main()
