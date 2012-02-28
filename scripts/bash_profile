@@ -1,0 +1,24 @@
+export HISTCONTROL=erasedups
+export HISTSIZE=10000
+
+shopt -s histappend
+
+export CLICOLOR=1
+export LSCOLORS=hefxcxdxbxegedabagacad
+export PS1="\[\033[01;31m\]\u@Brenik\[\033[00m\]:\[\033[0;44;37m\]\w\[\033[00m\]\$ "
+
+export LC_TYPE=en_US.UTF-8
+
+if [ -f $HOME/Library/Shell/bash_completion ]; then
+    source $HOME/Library/Shell/bash_completion
+
+    for cmd in $HOME/Library/Shell/bash_completion_scripts/* ; do
+        source $cmd
+    done
+fi
+
+if [ -f $HOME/Library/Shell/git_completion ]; then
+    source $HOME/Library/Shell/git_completion
+fi
+
+alias ls='ls -lh'
